@@ -1,16 +1,53 @@
-export function NoteCard() {
-  return (
-    <button className="rounded-md text-left bg-slate-800 p-5 outline-none space-y-3 overflow-hidden relative hover:ring-2 hover:ring-slate-600 focus-visible:ring-2 focus-visible:ring-lime-400">
-      <span className="text-sm font-medium text-slate-300">
-        Há 2 dias
-      </span>
-      <p className="text-sm leading-6 text-slate-400">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor debitis magnam similique commodi vitae mollitia delectus voluptas eveniet, tempora, asperiores quam sequi praesentium tenetur cupiditate atque dicta odio enim distinctio.
-        Rem ratione cupiditate dignissimos nulla placeat ipsa unde nostrum velit ducimus quidem. Porro repellendus tenetur quod, voluptatem vitae nemo est iure repudiandae! Cumque, tenetur. Minus, minima! Harum quo doloribus expedita?
-        Praesentium delectus rerum minima perferendis officiis, magni unde laboriosam quo eveniet aperiam suscipit doloribus consequuntur ab veniam velit ducimus eaque non expedita consequatur? Hic, maxime iste sint voluptates ipsum aspernatur!
-      </p>
+import * as Dialog from "@radix-ui/react-dialog";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { X } from 'lucide-react'
 
-      <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/60 to-black/0 pointer-events-none" />
-    </button>
-  )
+interface NoteCardProps {
+  note: {
+    date: Date;
+    content: string;
+  };
+}
+
+export function NoteCard({ note }: NoteCardProps) {
+  const distance = formatDistanceToNow(note.date, { locale: ptBR, addSuffix: true });
+  const capitalizedDistance = distance.charAt(0).toUpperCase() + distance.slice(1);
+
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger className="rounded-md text-left flex flex-col bg-slate-800 p-5 outline-none gap-3 overflow-hidden relative hover:ring-2 hover:ring-slate-600 focus-visible:ring-2 focus-visible:ring-lime-400">
+        <span className="text-sm font-medium text-slate-300">
+          {capitalizedDistance}
+        </span>
+        <p className="text-sm leading-6 text-slate-400">{note.content}</p>
+
+        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/60 to-black/0 pointer-events-none" />
+      </Dialog.Trigger>
+
+      <Dialog.Portal>
+        <Dialog.Overlay className="inset-0 fixed bg-black/50" />
+        <Dialog.Content className="overflow-hidden fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[640px] h-[60vh] w-full bg-slate-700 rounded-md flex flex-col outline-none">
+          <Dialog.Close className="absolute right-0 top-0 bg-slate-800 p-1.5 text-slate-400 hover:text-slate-100">
+            <X className="size-5" />
+          </Dialog.Close>
+
+          <div className="flex flex-1 flex-col gap-3 p-5">
+            <span className="text-sm font-medium text-slate-300">
+              {capitalizedDistance}
+            </span>
+            <p className="text-sm leading-6 text-slate-400">
+              {note.content}
+            </p>
+          </div>
+
+
+          <button type="button"
+            className="w-full bg-slate-800 py-4 text-center text-sm text-slate-300 outline-none font-medium group">
+            Deseja <span className="text-red-400 group-hover:underline">apagar essa nota</span>?
+          </button>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
 }
